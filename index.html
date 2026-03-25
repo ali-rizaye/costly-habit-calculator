@@ -621,6 +621,143 @@
     margin-bottom: 4px;
   }
 
+  /* EMAIL CAPTURE */
+  .email-capture {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 36px 28px;
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .email-capture::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+  }
+
+  .email-capture-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .email-capture h3 {
+    font-family: var(--font-display);
+    font-size: 28px;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+    line-height: 1.1;
+  }
+
+  .email-capture-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    line-height: 1.7;
+    max-width: 460px;
+  }
+
+  .email-capture-desc strong {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .email-form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .email-input-wrap {
+    flex: 1;
+    min-width: 220px;
+    position: relative;
+  }
+
+  .email-input-wrap input[type="email"] {
+    width: 100%;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 14px 18px;
+    border-radius: 4px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .email-input-wrap input[type="email"]::placeholder {
+    color: var(--text-dim);
+  }
+
+  .email-input-wrap input[type="email"]:focus {
+    border-color: var(--accent);
+  }
+
+  .email-submit-btn {
+    background: var(--accent2);
+    color: #fff;
+    border: none;
+    padding: 14px 24px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .email-submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(232,93,71,0.3);
+  }
+
+  .email-privacy {
+    margin-top: 12px;
+    font-size: 11px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .email-success {
+    display: none;
+    text-align: center;
+    padding: 20px 0 8px;
+  }
+
+  .email-success-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+
+  .email-success h4 {
+    font-family: var(--font-display);
+    font-size: 24px;
+    color: var(--green);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+  }
+
+  .email-success p {
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
   /* SHARE / CTA */
   .cta-block {
     border: 1px solid rgba(232,197,71,0.2);
@@ -959,6 +1096,34 @@
       <div class="invest-callout-desc" id="resultInvestedDesc"></div>
     </div>
 
+    <!-- EMAIL CAPTURE -->
+    <div class="email-capture">
+      <div class="email-capture-eyebrow">Free Download</div>
+      <h3>Get the Hidden Cost Report</h3>
+      <div class="email-capture-desc">
+        A free one-page PDF showing the <strong>12 most expensive unconscious habits</strong> — with their 20-year costs already calculated for you. No fluff. Just the numbers corporations don't want you to see.
+      </div>
+
+      <div id="emailFormWrap">
+        <div class="email-form">
+          <div class="email-input-wrap">
+            <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email">
+          </div>
+          <button class="email-submit-btn" onclick="handleEmailSubmit()">SEND ME THE PDF</button>
+        </div>
+        <div class="email-privacy">
+          <span>🔒</span>
+          No spam. No sharing. Unsubscribe any time. Your email stays private.
+        </div>
+      </div>
+
+      <div class="email-success" id="emailSuccess">
+        <div class="email-success-icon">✅</div>
+        <h4>You're in.</h4>
+        <p>Check your inbox — the Hidden Cost Report is on its way.</p>
+      </div>
+    </div>
+
     <!-- WHAT ELSE -->
     <div class="what-else">
       <div class="what-else-title">With that money you could have...</div>
@@ -1228,6 +1393,46 @@
     document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('calc').scrollIntoView({ behavior: 'smooth' });
   }
+
+  async function handleEmailSubmit() {
+  const input = document.getElementById('emailInput');
+  const email = input.value.trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailRegex.test(email)) {
+    input.style.borderColor = 'var(--accent2)';
+    input.focus();
+    setTimeout(() => input.style.borderColor = '', 2000);
+    return;
+  }
+
+  const btn = document.querySelector('.email-submit-btn');
+  btn.textContent = 'SENDING...';
+  btn.disabled = true;
+
+  try {
+    // ← REPLACE THIS URL WITH YOUR OWN KIT FORM URL
+    const KIT_FORM_URL = 'https://app.kit.com/forms/9248508/subscriptions';
+
+    await fetch(KIT_FORM_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ email_address: email }),
+      mode: 'no-cors'
+    });
+
+    // Show success — no-cors means we can't read the response
+    // but Kit will have received it
+    document.getElementById('emailFormWrap').style.display = 'none';
+    document.getElementById('emailSuccess').style.display = 'block';
+
+  } catch (err) {
+    btn.textContent = 'SEND ME THE PDF';
+    btn.disabled = false;
+    input.style.borderColor = 'var(--accent2)';
+    input.placeholder = 'Something went wrong — try again';
+  }
+}
 
   function shareResult() {
     const name = document.getElementById('habitName').value.trim() || 'a habit';
