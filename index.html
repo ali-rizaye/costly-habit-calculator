@@ -1410,27 +1410,37 @@
   btn.textContent = 'SENDING...';
   btn.disabled = true;
 
+  // ← REPLACE XXXXXXX WITH YOUR KIT FORM ID (numbers only)
+  const KIT_FORM_ID = '9248508';
+
   try {
-    // ← REPLACE THIS URL WITH YOUR OWN KIT FORM URL
-    const KIT_FORM_URL = 'https://app.kit.com/forms/9248508/subscriptions';
+    const response = await fetch(
+      `https://app.kit.com/forms/${KIT_FORM_ID}/subscriptions`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({ email_address: email })
+      }
+    );
 
-    await fetch(KIT_FORM_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ email_address: email }),
-      mode: 'no-cors'
-    });
+    const data = await response.json();
 
-    // Show success — no-cors means we can't read the response
-    // but Kit will have received it
-    document.getElementById('emailFormWrap').style.display = 'none';
-    document.getElementById('emailSuccess').style.display = 'block';
+    if (response.ok || data.status === 'quarantined' || data.subscription) {
+      document.getElementById('emailFormWrap').style.display = 'none';
+      document.getElementById('emailSuccess').style.display = 'block';
+    } else {
+      throw new Error(data.message || 'Submission failed');
+    }
 
   } catch (err) {
     btn.textContent = 'SEND ME THE PDF';
     btn.disabled = false;
     input.style.borderColor = 'var(--accent2)';
     input.placeholder = 'Something went wrong — try again';
+    console.error('Kit error:', err);
   }
 }
 
