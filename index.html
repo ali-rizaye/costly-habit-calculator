@@ -673,58 +673,6 @@
     font-weight: 500;
   }
 
-  .email-form {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
-
-  .email-input-wrap {
-    flex: 1;
-    min-width: 220px;
-    position: relative;
-  }
-
-  .email-input-wrap input[type="email"] {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 14px 18px;
-    border-radius: 4px;
-    font-family: var(--font-body);
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .email-input-wrap input[type="email"]::placeholder {
-    color: var(--text-dim);
-  }
-
-  .email-input-wrap input[type="email"]:focus {
-    border-color: var(--accent);
-  }
-
-  .email-submit-btn {
-    background: var(--accent2);
-    color: #fff;
-    border: none;
-    padding: 14px 24px;
-    font-family: var(--font-display);
-    font-size: 18px;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-
-  .email-submit-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 24px rgba(232,93,71,0.3);
-  }
-
   .email-privacy {
     margin-top: 12px;
     font-size: 11px;
@@ -734,28 +682,125 @@
     gap: 6px;
   }
 
-  .email-success {
-    display: none;
-    text-align: center;
-    padding: 20px 0 8px;
+  /* ── Kit form overrides ── */
+
+  /* Wipe Kit's white card background */
+  .formkit-form[data-uid="57b995c8fb"],
+  .formkit-form[data-uid="57b995c8fb"] [data-style="clean"] {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    max-width: 100% !important;
   }
 
-  .email-success-icon {
-    font-size: 32px;
-    margin-bottom: 10px;
+  /* Row layout: input + button side by side */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-fields {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    margin: 0 !important;
   }
 
-  .email-success h4 {
-    font-family: var(--font-display);
-    font-size: 24px;
-    color: var(--green);
-    margin-bottom: 6px;
-    letter-spacing: 0.02em;
+  /* Input takes all remaining space */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-field {
+    flex: 1 1 220px !important;
+    margin: 0 !important;
   }
 
-  .email-success p {
-    font-size: 13px;
-    color: var(--text-muted);
+  /* Button fixed width, no flex-grow */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-submit {
+    flex: 0 0 auto !important;
+    margin: 0 !important;
+    position: static !important;
+  }
+
+  /* Email input — dark theme */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-input {
+    background: var(--surface2) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 4px !important;
+    color: var(--text) !important;
+    font-family: var(--font-body) !important;
+    font-size: 14px !important;
+    padding: 14px 18px !important;
+    height: auto !important;
+    transition: border-color 0.2s !important;
+  }
+
+  .formkit-form[data-uid="57b995c8fb"] .formkit-input::placeholder {
+    color: var(--text-dim) !important;
+    opacity: 1 !important;
+  }
+
+  .formkit-form[data-uid="57b995c8fb"] .formkit-input:focus {
+    border-color: var(--accent) !important;
+    outline: none !important;
+  }
+
+  /* Submit button — accent2 red, Bebas Neue font */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-submit {
+    background-color: var(--accent2) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    transition: transform 0.2s, box-shadow 0.2s !important;
+  }
+
+  .formkit-form[data-uid="57b995c8fb"] .formkit-submit > span {
+    font-family: var(--font-display) !important;
+    font-size: 18px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0.05em !important;
+    color: #fff !important;
+    padding: 14px 24px !important;
+    white-space: nowrap !important;
+    background-color: transparent !important;
+  }
+
+  /* Hover glow effect — matches your design exactly */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-submit:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 24px rgba(232, 93, 71, 0.35) !important;
+  }
+
+  .formkit-form[data-uid="57b995c8fb"] .formkit-submit:hover > span {
+    background-color: rgba(0,0,0,0.08) !important;
+  }
+
+  .formkit-form[data-uid="57b995c8fb"] .formkit-submit:active {
+    transform: translateY(0) !important;
+    box-shadow: none !important;
+  }
+
+  /* Hide "Built with Kit" branding */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-powered-by-convertkit-container {
+    display: none !important;
+  }
+
+  /* Success message — match green theme */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-alert-success {
+    background: rgba(78, 207, 130, 0.08) !important;
+    border-color: rgba(78, 207, 130, 0.3) !important;
+    color: var(--green) !important;
+    font-family: var(--font-mono) !important;
+    font-size: 13px !important;
+    border-radius: 4px !important;
+  }
+
+  /* Error message */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-alert-error {
+    background: rgba(232, 93, 71, 0.08) !important;
+    border-color: rgba(232, 93, 71, 0.3) !important;
+    color: var(--accent2) !important;
+    font-family: var(--font-mono) !important;
+    font-size: 13px !important;
+    border-radius: 4px !important;
+  }
+
+  /* Loading spinner — keep white on red */
+  .formkit-form[data-uid="57b995c8fb"] .formkit-spinner > div {
+    background-color: #fff !important;
   }
 
   /* SHARE / CTA */
@@ -1104,23 +1149,11 @@
         A free one-page PDF showing the <strong>12 most expensive unconscious habits</strong> — with their 20-year costs already calculated for you. No fluff. Just the numbers corporations don't want you to see.
       </div>
 
-      <div id="emailFormWrap">
-        <div class="email-form">
-          <div class="email-input-wrap">
-            <input type="email" id="emailInput" placeholder="your@email.com" autocomplete="email">
-          </div>
-          <button class="email-submit-btn" onclick="handleEmailSubmit()">SEND ME THE PDF</button>
-        </div>
-        <div class="email-privacy">
-          <span>🔒</span>
-          No spam. No sharing. Unsubscribe any time. Your email stays private.
-        </div>
-      </div>
+      <script async data-uid="57b995c8fb" src="https://costly-choices.kit.com/57b995c8fb/index.js"></script>
 
-      <div class="email-success" id="emailSuccess">
-        <div class="email-success-icon">✅</div>
-        <h4>You're in.</h4>
-        <p>Check your inbox — the Hidden Cost Report is on its way.</p>
+      <div class="email-privacy">
+        <span>🔒</span>
+        No spam. No sharing. Unsubscribe any time. Your email stays private.
       </div>
     </div>
 
@@ -1393,56 +1426,6 @@
     document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('calc').scrollIntoView({ behavior: 'smooth' });
   }
-
-  async function handleEmailSubmit() {
-  const input = document.getElementById('emailInput');
-  const email = input.value.trim();
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  if (!emailRegex.test(email)) {
-    input.style.borderColor = 'var(--accent2)';
-    input.focus();
-    setTimeout(() => input.style.borderColor = '', 2000);
-    return;
-  }
-
-  const btn = document.querySelector('.email-submit-btn');
-  btn.textContent = 'SENDING...';
-  btn.disabled = true;
-
-  // ← REPLACE XXXXXXX WITH YOUR KIT FORM ID (numbers only)
-  const KIT_FORM_ID = '9248508';
-
-  try {
-    const response = await fetch(
-      `https://app.kit.com/forms/${KIT_FORM_ID}/subscriptions`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ email_address: email })
-      }
-    );
-
-    const data = await response.json();
-
-    if (response.ok || data.status === 'quarantined' || data.subscription) {
-      document.getElementById('emailFormWrap').style.display = 'none';
-      document.getElementById('emailSuccess').style.display = 'block';
-    } else {
-      throw new Error(data.message || 'Submission failed');
-    }
-
-  } catch (err) {
-    btn.textContent = 'SEND ME THE PDF';
-    btn.disabled = false;
-    input.style.borderColor = 'var(--accent2)';
-    input.placeholder = 'Something went wrong — try again';
-    console.error('Kit error:', err);
-  }
-}
 
   function shareResult() {
     const name = document.getElementById('habitName').value.trim() || 'a habit';
