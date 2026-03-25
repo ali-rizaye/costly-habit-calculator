@@ -1,1 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Costly Habit Calculator — Costly Choices</title>
+<meta name="description" content="Discover the shocking true lifetime cost of your daily habits. See what your coffee, subscriptions, and takeout really cost you over 10–30 years.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0a0a08;
+    --surface: #111110;
+    --surface2: #1a1a17;
+    --border: #2a2a25;
+    --accent: #e8c547;
+    --accent2: #e85d47;
+    --text: #f0ede4;
+    --text-muted: #7a7a6e;
+    --text-dim: #4a4a42;
+    --green: #4ecf82;
+    --font-display: 'Bebas Neue', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
 
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.4;
+  }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 60px 24px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 400px;
+    background: radial-gradient(ellipse, rgba(232,197,71,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .brand {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 32px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.1s;
+  }
+
+  .brand a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .brand a:hover { text-decoration: underline; }
+
+  .hero-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.2s;
+  }
+
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(64px, 12vw, 130px);
+    line-height: 0.9;
+    letter-spacing: 0.01em;
+    color: var(--text);
+    margin-bottom: 24px;
+    opacity: 0;
+    animation: fadeUp 0.7s ease forwards 0.3s;
+  }
+
+  h1 span {
+    color: var(--accent);
+    display: block;
+  }
+
+  .hero-sub {
+    font-size: 16px;
+    color: var(--text-muted);
+    max-width: 480px;
+    line-height: 1.7;
+    margin-bottom: 48px;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.5s;
+  }
+
+  .scroll-cue {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    opacity: 0;
+    animation: fadeUp 0.6s ease forwards 0.7s;
+    cursor: pointer;
+    width: fit-content;
+    border: none;
+    background: none;
+    color: var(--text-dim);
+  }
+
+  .scroll-cue:hover { color: var(--accent); }
+
+  .scroll-line {
+    width: 40px;
+    height: 1px;
+    background: var(--text-dim);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .scroll-line::after {
+    content: '';
+    position: absolute;
+    left: -100%;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--accent);
+    animation: scanline 2s ease infinite;
+  }
+
+  /* CALCULATOR SECTION */
+  .calculator-section {
+    padding: 80px 24px;
+    max-width: 760px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 48px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* HABIT PRESETS */
+  .presets-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 40px;
+  }
+
+  .preset-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    padding: 12px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 400;
+    text-align: left;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .preset-btn:hover {
+    border-color: var(--accent);
+    color: var(--text);
+    background: var(--surface2);
+  }
+
+  .preset-btn.active {
+    border-color: var(--accent);
+    background: rgba(232,197,71,0.06);
+    color: var(--accent);
+  }
+
+  .preset-emoji { font-size: 18px; }
+  .preset-name { font-weight: 500; font-size: 12px; }
+
+  /* INPUTS */
+  .inputs-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 40px;
+  }
+
+  .input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 520px) {
+    .input-row { grid-template-columns: 1fr; }
+  }
+
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .field-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .field-input-wrap {
+    position: relative;
+  }
+
+  .field-prefix {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  input[type="number"],
+  input[type="text"],
+  select {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 14px 16px;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+    appearance: textfield;
+  }
+
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+
+  .has-prefix input { padding-left: 30px; }
+
+  input:focus, select:focus {
+    border-color: var(--accent);
+  }
+
+  select {
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a7a6e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+  }
+
+  select option { background: var(--surface); }
+
+  /* SLIDER */
+  .slider-field { grid-column: 1 / -1; }
+
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
+  .slider-value {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  input[type="range"] {
+    width: 100%;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    outline: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+    cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(232,197,71,0.15);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--accent);
+    border: 2px solid var(--bg);
+    cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(232,197,71,0.15);
+  }
+
+  /* CALCULATE BUTTON */
+  .calc-btn {
+    width: 100%;
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 18px 32px;
+    font-family: var(--font-display);
+    font-size: 22px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .calc-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0);
+    transition: background 0.2s;
+  }
+
+  .calc-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 32px rgba(232,197,71,0.3);
+  }
+
+  .calc-btn:active { transform: translateY(0); }
+
+  /* RESULTS */
+  #results {
+    display: none;
+    margin-top: 80px;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: all 0.6s ease;
+  }
+
+  #results.visible {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* BIG NUMBER */
+  .drain-hero {
+    text-align: center;
+    padding: 60px 24px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--surface);
+    margin-bottom: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .drain-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(ellipse, rgba(232,85,71,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .drain-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+
+  .drain-habit-name {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .drain-amount {
+    font-family: var(--font-display);
+    font-size: clamp(64px, 14vw, 120px);
+    line-height: 1;
+    color: var(--accent2);
+    margin-bottom: 8px;
+    letter-spacing: -0.02em;
+  }
+
+  .drain-period {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .drain-verdict {
+    margin-top: 20px;
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.7;
+  }
+
+  /* BREAKDOWN GRID */
+  .breakdown-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 32px;
+  }
+
+  @media (max-width: 520px) {
+    .breakdown-grid { grid-template-columns: 1fr; }
+  }
+
+  .breakdown-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 20px 16px;
+    text-align: center;
+  }
+
+  .breakdown-card-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .breakdown-card-amount {
+    font-family: var(--font-display);
+    font-size: 32px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .breakdown-card-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 6px;
+  }
+
+  /* CHART */
+  .chart-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 24px;
+    margin-bottom: 32px;
+  }
+
+  .chart-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 24px;
+  }
+
+  .chart-container {
+    position: relative;
+    height: 260px;
+  }
+
+  /* INVESTMENT CALLOUT */
+  .invest-callout {
+    background: rgba(78,207,130,0.05);
+    border: 1px solid rgba(78,207,130,0.2);
+    border-radius: 8px;
+    padding: 28px 24px;
+    margin-bottom: 32px;
+  }
+
+  .invest-callout-header {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--green);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .invest-callout-amount {
+    font-family: var(--font-display);
+    font-size: clamp(36px, 7vw, 64px);
+    color: var(--green);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .invest-callout-desc {
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  /* WHAT ELSE */
+  .what-else {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 24px;
+    margin-bottom: 32px;
+  }
+
+  .what-else-title {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .what-else-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+
+  .what-else-item {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .what-else-item strong {
+    display: block;
+    font-weight: 500;
+    color: var(--text);
+    font-size: 15px;
+    font-family: var(--font-mono);
+    margin-bottom: 4px;
+  }
+
+  /* SHARE / CTA */
+  .cta-block {
+    border: 1px solid rgba(232,197,71,0.2);
+    border-radius: 8px;
+    padding: 36px 28px;
+    text-align: center;
+    background: rgba(232,197,71,0.03);
+    margin-bottom: 32px;
+  }
+
+  .cta-block h3 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    color: var(--text);
+    margin-bottom: 10px;
+    letter-spacing: 0.02em;
+  }
+
+  .cta-block p {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    max-width: 380px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--bg);
+    border: none;
+    padding: 14px 28px;
+    font-family: var(--font-display);
+    font-size: 18px;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-block;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(232,197,71,0.25);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 14px 28px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s;
+    display: inline-block;
+    text-transform: uppercase;
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--text-muted);
+    color: var(--text);
+  }
+
+  /* RESET */
+  .reset-link {
+    text-align: center;
+    margin-top: 16px;
+  }
+
+  .reset-link button {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .reset-link button:hover { color: var(--text-muted); }
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 24px;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: gap;
+    gap: 16px;
+  }
+
+  .footer-brand {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  .footer-brand a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .footer-note {
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: right;
+    max-width: 280px;
+    line-height: 1.6;
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes scanline {
+    0% { left: -100%; }
+    50%, 100% { left: 100%; }
+  }
+
+  @keyframes countUp {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .drain-amount { animation: countUp 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+
+  /* TOOLTIP */
+  .field-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* CUSTOM HABIT NAME */
+  .habit-name-field {
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="brand">
+    <a href="https://www.youtube.com/@Costly_Choices_Official" target="_blank" rel="noopener">⬥ Costly Choices</a>
+  </div>
+  <p class="hero-eyebrow">Free Tool · No Login · No Data Collected</p>
+  <h1>How Much<span>Is It Really<br>Costing You?</span></h1>
+  <p class="hero-sub">Enter any daily habit — coffee, takeout, cigarettes, subscriptions — and see its true lifetime cost. The number will shock you.</p>
+  <button class="scroll-cue" onclick="document.getElementById('calc').scrollIntoView({behavior:'smooth'})">
+    <span class="scroll-line"></span>
+    Calculate yours
+  </button>
+</section>
+
+<!-- CALCULATOR -->
+<section class="calculator-section" id="calc">
+  <div class="section-label">Step 1 — Pick a habit or enter your own</div>
+
+  <!-- PRESETS -->
+  <div class="presets-grid" id="presets">
+    <button class="preset-btn" data-name="Daily Coffee" data-cost="5.50" data-freq="daily" onclick="applyPreset(this)">
+      <span class="preset-emoji">☕</span>
+      <span class="preset-name">Daily Coffee</span>
+    </button>
+    <button class="preset-btn" data-name="Cigarettes" data-cost="12.00" data-freq="daily" onclick="applyPreset(this)">
+      <span class="preset-emoji">🚬</span>
+      <span class="preset-name">Cigarettes</span>
+    </button>
+    <button class="preset-btn" data-name="Takeout Lunch" data-cost="14.00" data-freq="daily" onclick="applyPreset(this)">
+      <span class="preset-emoji">🥡</span>
+      <span class="preset-name">Takeout Lunch</span>
+    </button>
+    <button class="preset-btn" data-name="Streaming Apps" data-cost="45.00" data-freq="monthly" onclick="applyPreset(this)">
+      <span class="preset-emoji">📺</span>
+      <span class="preset-name">Streaming Apps</span>
+    </button>
+    <button class="preset-btn" data-name="Energy Drinks" data-cost="4.00" data-freq="daily" onclick="applyPreset(this)">
+      <span class="preset-emoji">⚡</span>
+      <span class="preset-name">Energy Drinks</span>
+    </button>
+    <button class="preset-btn" data-name="Weekend Drinks" data-cost="60.00" data-freq="weekly" onclick="applyPreset(this)">
+      <span class="preset-emoji">🍺</span>
+      <span class="preset-name">Weekend Drinks</span>
+    </button>
+    <button class="preset-btn" data-name="Gym Membership" data-cost="50.00" data-freq="monthly" onclick="applyPreset(this)">
+      <span class="preset-emoji">💪</span>
+      <span class="preset-name">Gym (unused)</span>
+    </button>
+    <button class="preset-btn" data-name="Fast Food" data-cost="10.00" data-freq="daily" onclick="applyPreset(this)">
+      <span class="preset-emoji">🍔</span>
+      <span class="preset-name">Fast Food</span>
+    </button>
+  </div>
+
+  <div class="section-label">Step 2 — Adjust the details</div>
+
+  <div class="inputs-stack">
+
+    <!-- Habit Name -->
+    <div class="field habit-name-field">
+      <label class="field-label" for="habitName">Habit name</label>
+      <input type="text" id="habitName" placeholder="e.g. Morning coffee" maxlength="40">
+    </div>
+
+    <div class="input-row">
+      <!-- Cost -->
+      <div class="field">
+        <label class="field-label" for="habitCost">Cost per occurrence ($)</label>
+        <div class="field-input-wrap has-prefix">
+          <span class="field-prefix">$</span>
+          <input type="number" id="habitCost" placeholder="0.00" min="0.01" step="0.01">
+        </div>
+        <span class="field-hint">Average amount you spend each time</span>
+      </div>
+
+      <!-- Frequency -->
+      <div class="field">
+        <label class="field-label" for="habitFreq">How often?</label>
+        <div class="field-input-wrap">
+          <select id="habitFreq">
+            <option value="daily">Every day</option>
+            <option value="weekdays">Weekdays only (5×/week)</option>
+            <option value="weekly">Once a week</option>
+            <option value="monthly">Once a month</option>
+            <option value="custom">Custom — enter times/week</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom frequency -->
+    <div class="field" id="customFreqField" style="display:none;">
+      <label class="field-label" for="customTimes">Times per week</label>
+      <input type="number" id="customTimes" placeholder="3" min="1" max="21" step="1">
+    </div>
+
+    <!-- Years slider -->
+    <div class="field slider-field">
+      <div class="slider-header">
+        <label class="field-label" for="yearsSlider">Project over</label>
+        <span class="slider-value" id="yearsDisplay">20 years</span>
+      </div>
+      <input type="range" id="yearsSlider" min="1" max="40" value="20" step="1">
+    </div>
+
+    <!-- Return rate -->
+    <div class="input-row">
+      <div class="field">
+        <label class="field-label" for="returnRate">If invested — annual return (%)</label>
+        <div class="field-input-wrap">
+          <input type="number" id="returnRate" value="7" min="1" max="20" step="0.5">
+        </div>
+        <span class="field-hint">S&P 500 avg ≈ 7–10%</span>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="inflationRate">Inflation rate (%)</label>
+        <div class="field-input-wrap">
+          <input type="number" id="inflationRate" value="3" min="0" max="15" step="0.5">
+        </div>
+        <span class="field-hint">US avg ≈ 3%</span>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="calc-btn" onclick="calculate()">SHOW ME THE REAL COST</button>
+
+  <!-- RESULTS -->
+  <div id="results">
+
+    <div class="section-label" style="margin-top: 64px;">Your Results</div>
+
+    <!-- HERO NUMBER -->
+    <div class="drain-hero">
+      <div class="drain-label">Total spent on</div>
+      <div class="drain-habit-name" id="resultHabitName">—</div>
+      <div class="drain-amount" id="resultTotalCost">$0</div>
+      <div class="drain-period" id="resultPeriod">over 20 years</div>
+      <div class="drain-verdict" id="resultVerdict"></div>
+    </div>
+
+    <!-- BREAKDOWN -->
+    <div class="breakdown-grid">
+      <div class="breakdown-card">
+        <div class="breakdown-card-label">Per Year</div>
+        <div class="breakdown-card-amount" id="resultYearly">$0</div>
+        <div class="breakdown-card-sub">you're spending</div>
+      </div>
+      <div class="breakdown-card">
+        <div class="breakdown-card-label">Per Month</div>
+        <div class="breakdown-card-amount" id="resultMonthly">$0</div>
+        <div class="breakdown-card-sub">average</div>
+      </div>
+      <div class="breakdown-card">
+        <div class="breakdown-card-label">Inflation-Adjusted</div>
+        <div class="breakdown-card-amount" id="resultInflation">$0</div>
+        <div class="breakdown-card-sub">real cost in today's money</div>
+      </div>
+    </div>
+
+    <!-- CHART -->
+    <div class="chart-wrap">
+      <div class="chart-title">Cumulative spend over time</div>
+      <div class="chart-container">
+        <canvas id="growthChart"></canvas>
+      </div>
+    </div>
+
+    <!-- INVESTMENT CALLOUT -->
+    <div class="invest-callout">
+      <div class="invest-callout-header">💸 What if you invested it instead?</div>
+      <div class="invest-callout-amount" id="resultInvested">$0</div>
+      <div class="invest-callout-desc" id="resultInvestedDesc"></div>
+    </div>
+
+    <!-- WHAT ELSE -->
+    <div class="what-else">
+      <div class="what-else-title">With that money you could have...</div>
+      <div class="what-else-grid" id="whatElseGrid"></div>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-block">
+      <h3>Sound familiar?</h3>
+      <p>Corporations design these habits deliberately. See exactly how they engineer your spending on Costly Choices.</p>
+      <div class="cta-buttons">
+        <a href="https://www.youtube.com/@Costly_Choices_Official" target="_blank" rel="noopener" class="btn-primary">Watch on YouTube</a>
+        <button class="btn-secondary" onclick="shareResult()">Share Your Result</button>
+      </div>
+    </div>
+
+    <div class="reset-link">
+      <button onclick="resetCalc()">← Calculate a different habit</button>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-brand">
+    Built by <a href="https://www.youtube.com/@Costly_Choices_Official" target="_blank" rel="noopener">Costly Choices</a><br>
+    Free forever · Open source
+  </div>
+  <div class="footer-note">
+    All calculations are estimates for educational purposes only. Investment returns are not guaranteed. Past performance does not predict future results.
+  </div>
+</footer>
+
+<script>
+  let chartInstance = null;
+
+  // Frequency dropdown
+  document.getElementById('habitFreq').addEventListener('change', function() {
+    document.getElementById('customFreqField').style.display =
+      this.value === 'custom' ? 'block' : 'none';
+  });
+
+  // Years slider
+  document.getElementById('yearsSlider').addEventListener('input', function() {
+    document.getElementById('yearsDisplay').textContent = this.value + ' year' + (this.value == 1 ? '' : 's');
+  });
+
+  function applyPreset(btn) {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('habitName').value = btn.dataset.name;
+    document.getElementById('habitCost').value = btn.dataset.cost;
+    document.getElementById('habitFreq').value = btn.dataset.freq;
+    document.getElementById('customFreqField').style.display = 'none';
+  }
+
+  function getTimesPerYear(freq, customTimes) {
+    switch(freq) {
+      case 'daily': return 365;
+      case 'weekdays': return 260;
+      case 'weekly': return 52;
+      case 'monthly': return 12;
+      case 'custom': return (parseFloat(customTimes) || 1) * 52;
+      default: return 365;
+    }
+  }
+
+  function fmt(n) {
+    if (n >= 1000000) return '$' + (n / 1000000).toFixed(2) + 'M';
+    if (n >= 1000) return '$' + Math.round(n).toLocaleString();
+    return '$' + n.toFixed(2);
+  }
+
+  function fmtShort(n) {
+    if (n >= 1000000) return '$' + (n / 1000000).toFixed(1) + 'M';
+    if (n >= 1000) return '$' + (n / 1000).toFixed(0) + 'K';
+    return '$' + Math.round(n);
+  }
+
+  function calculate() {
+    const name = document.getElementById('habitName').value.trim() || 'this habit';
+    const cost = parseFloat(document.getElementById('habitCost').value);
+    const freq = document.getElementById('habitFreq').value;
+    const customTimes = document.getElementById('customTimes').value;
+    const years = parseInt(document.getElementById('yearsSlider').value);
+    const returnRate = parseFloat(document.getElementById('returnRate').value) / 100;
+    const inflationRate = parseFloat(document.getElementById('inflationRate').value) / 100;
+
+    if (!cost || cost <= 0) {
+      document.getElementById('habitCost').focus();
+      document.getElementById('habitCost').style.borderColor = 'var(--accent2)';
+      setTimeout(() => document.getElementById('habitCost').style.borderColor = '', 2000);
+      return;
+    }
+
+    const timesPerYear = getTimesPerYear(freq, customTimes);
+    const yearlySpend = cost * timesPerYear;
+    const monthlySpend = yearlySpend / 12;
+    const totalSpend = yearlySpend * years;
+
+    // Inflation-adjusted total (future cost is higher)
+    let inflationTotal = 0;
+    for (let y = 1; y <= years; y++) {
+      inflationTotal += yearlySpend * Math.pow(1 + inflationRate, y);
+    }
+
+    // Investment future value (compound monthly contributions)
+    const monthlyContrib = monthlySpend;
+    const monthlyRate = returnRate / 12;
+    const months = years * 12;
+    let investedValue = monthlyContrib * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
+
+    // Build chart data
+    const labels = [];
+    const spendData = [];
+    const investData = [];
+    for (let y = 0; y <= years; y++) {
+      labels.push(y === 0 ? 'Now' : `Year ${y}`);
+      spendData.push(Math.round(yearlySpend * y));
+      const m = y * 12;
+      investData.push(Math.round(
+        m === 0 ? 0 : monthlyContrib * ((Math.pow(1 + monthlyRate, m) - 1) / monthlyRate) * (1 + monthlyRate)
+      ));
+    }
+
+    // Verdicts
+    const verdicts = [
+      `That's ${Math.round(yearlySpend / 52)} weeks of groceries every year, just on ${name}.`,
+      `Most people have no idea they're spending this much on ${name}. Now you do.`,
+      `This isn't about judging you — it's about showing you what the math actually looks like.`,
+      `Corporations spend billions designing this habit. The least you can do is know the price.`,
+      `This number doesn't include the mental cost of the habit. Just the financial one.`
+    ];
+    const verdict = verdicts[Math.floor(Math.random() * verdicts.length)];
+
+    // What else
+    const comparisons = [
+      { label: 'Round-trip flights', value: Math.floor(totalSpend / 800), unit: 'to Europe' },
+      { label: 'Months of rent', value: Math.floor(totalSpend / 1500), unit: 'at $1,500/mo' },
+      { label: 'Emergency fund', value: Math.round(totalSpend / 10000) + 'x', unit: 'funded' },
+      { label: 'College semesters', value: Math.floor(totalSpend / 12000), unit: 'paid for' },
+      { label: 'Used cars', value: Math.floor(totalSpend / 8000), unit: 'bought outright' },
+    ].filter(c => {
+      const val = parseFloat(c.value);
+      return val >= 1;
+    });
+
+    // Render
+    document.getElementById('resultHabitName').textContent = name;
+    document.getElementById('resultTotalCost').textContent = fmt(totalSpend);
+    document.getElementById('resultPeriod').textContent = `over ${years} year${years === 1 ? '' : 's'}`;
+    document.getElementById('resultVerdict').textContent = verdict;
+    document.getElementById('resultYearly').textContent = fmtShort(yearlySpend);
+    document.getElementById('resultMonthly').textContent = fmtShort(monthlySpend);
+    document.getElementById('resultInflation').textContent = fmtShort(inflationTotal);
+    document.getElementById('resultInvested').textContent = fmt(investedValue);
+    document.getElementById('resultInvestedDesc').textContent =
+      `If instead of spending ${fmt(monthlySpend)}/month on ${name}, you invested it at ${(returnRate * 100).toFixed(1)}% annual return — that's what you'd have after ${years} years. The real cost of a habit isn't just the money spent. It's the wealth never built.`;
+
+    const grid = document.getElementById('whatElseGrid');
+    grid.innerHTML = comparisons.slice(0, 4).map(c => `
+      <div class="what-else-item">
+        <strong>${c.value}</strong>${c.label}<br><span style="font-size:11px;color:var(--text-dim)">${c.unit}</span>
+      </div>
+    `).join('');
+
+    // Chart
+    if (chartInstance) chartInstance.destroy();
+    const ctx = document.getElementById('growthChart').getContext('2d');
+
+    // Thin out labels for readability
+    const step = years <= 10 ? 1 : years <= 20 ? 2 : 5;
+    const filteredLabels = labels.filter((_, i) => i % step === 0 || i === years);
+
+    chartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: 'Total spent',
+            data: spendData,
+            borderColor: '#e85d47',
+            backgroundColor: 'rgba(232,93,71,0.08)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+          },
+          {
+            label: 'If invested instead',
+            data: investData,
+            borderColor: '#4ecf82',
+            backgroundColor: 'rgba(78,207,130,0.06)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 0,
+            pointHoverRadius: 5,
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { intersect: false, mode: 'index' },
+        plugins: {
+          legend: {
+            labels: {
+              color: '#7a7a6e',
+              font: { family: 'DM Mono', size: 11 },
+              boxWidth: 12,
+              padding: 20
+            }
+          },
+          tooltip: {
+            backgroundColor: '#1a1a17',
+            borderColor: '#2a2a25',
+            borderWidth: 1,
+            titleColor: '#f0ede4',
+            bodyColor: '#7a7a6e',
+            titleFont: { family: 'DM Mono', size: 11 },
+            bodyFont: { family: 'DM Mono', size: 11 },
+            callbacks: {
+              label: ctx => ` ${ctx.dataset.label}: $${ctx.raw.toLocaleString()}`
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: 'rgba(42,42,37,0.8)', drawBorder: false },
+            ticks: {
+              color: '#4a4a42',
+              font: { family: 'DM Mono', size: 10 },
+              maxTicksLimit: 8,
+            }
+          },
+          y: {
+            grid: { color: 'rgba(42,42,37,0.8)', drawBorder: false },
+            ticks: {
+              color: '#4a4a42',
+              font: { family: 'DM Mono', size: 10 },
+              callback: v => v >= 1000 ? '$' + (v/1000).toFixed(0) + 'K' : '$' + v
+            }
+          }
+        }
+      }
+    });
+
+    // Show results
+    const resultsEl = document.getElementById('results');
+    resultsEl.style.display = 'block';
+    setTimeout(() => {
+      resultsEl.classList.add('visible');
+      resultsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
+  }
+
+  function resetCalc() {
+    const resultsEl = document.getElementById('results');
+    resultsEl.classList.remove('visible');
+    setTimeout(() => {
+      resultsEl.style.display = 'none';
+    }, 400);
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('calc').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function shareResult() {
+    const name = document.getElementById('habitName').value.trim() || 'a habit';
+    const total = document.getElementById('resultTotalCost').textContent;
+    const years = document.getElementById('yearsSlider').value;
+    const text = `I just calculated that ${name} will cost me ${total} over ${years} years 😳 Find out yours → https://ali-rizaye.github.io/costly-habit-calculator/ via @Costly_Choices_Official`;
+
+    if (navigator.share) {
+      navigator.share({ title: 'Costly Habit Calculator', text });
+    } else if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Result copied to clipboard! Paste it anywhere to share.');
+      });
+    } else {
+      prompt('Copy this to share:', text);
+    }
+  }
+</script>
+</body>
+</html>
